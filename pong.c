@@ -4,3 +4,7 @@
 #include "Cloudy/Render/simple_window.h"
 #include "Cloudy/Render/drawing.h"
 #include "Cloudy/Physics/physics.h"
+
+int main(void) {
+
+}
