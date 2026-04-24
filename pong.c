@@ -1,6 +1,7 @@
 #include "Cloudy/Entity/entity.h"
 #include "Cloudy/Input/input_man.h"
 #include "Cloudy/Ext/misc.h"
+#include "Cloudy/Events/events.h"
 #include "Cloudy/Render/simple_window.h"
 #include "Cloudy/Render/drawing.h"
 #include "Cloudy/Physics/physics.h"
@@ -25,7 +26,10 @@ int main(void) {
         CDY_FPSBegin(fps);
         /* GAME LOOP START */
 
-
+        CDY_Event event;
+        while (CDY_PollEvent(&event)) {
+                if (event.type == CDY_EVENT_QUIT) running = 0; // quit game
+        }
         // Dont forget to add a quit event poll!
         CDY_ColorRenderer(simple_window, 0, 0, 0, 255); //BG colour
         CDY_WipeRenderer(simple_window);
