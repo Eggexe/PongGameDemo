@@ -97,9 +97,15 @@ int main(void) {
             ballMoveSpeedY *= -1;
         }
 
-        if (CDY_AABBCollide(paddle1, ball) || CDY_AABBCollide(paddle2, ball))
+        if (CDY_AABBCollide(paddle1, ball))
         {
-            ballMoveSpeedY *= -1;
+            ball->posX = paddle1->posX + paddle1->scaleX;
+            ballMoveSpeedX *= -1;
+        }
+        if (CDY_AABBCollide(paddle2, ball))
+        {
+            ball->posX = paddle2->posX - ball->scaleX;
+            ballMoveSpeedX *= -1;
         }
 
         CDY_ArmRenderer(simple_window);
