@@ -30,7 +30,7 @@ int main(void) {
         while (CDY_PollEvent(&event)) {
                 if (event.type == CDY_EVENT_QUIT) running = 0; // quit game
         }
-        // Dont forget to add a quit event poll!
+
         CDY_ColorRenderer(simple_window, 0, 0, 0, 255); //BG colour
         CDY_WipeRenderer(simple_window);
 
@@ -43,5 +43,5 @@ int main(void) {
         /* GAME LOOP END */
         CDY_FPSEnd(fps);
     }
-
+    CDY_Close();
 }
