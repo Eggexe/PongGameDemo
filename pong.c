@@ -5,6 +5,7 @@
 #include "Cloudy/Render/simple_window.h"
 #include "Cloudy/Render/drawing.h"
 #include "Cloudy/Physics/physics.h"
+#include "Cloudy/UI/ui.h"
 
 int gameScreenWidth = 640;
 int gameScreenHeight = 480;
@@ -37,6 +38,7 @@ int main(void) {
     float ballMoveSpeedX = 2.0f;
     float ballMoveSpeedY = 2.0f;
 
+    CDY_Font *fontmain = CDY_FontLoadDefault(32);
 
     int running = 1;
     while (running)
@@ -49,8 +51,12 @@ int main(void) {
                 if (event.type == CDY_EVENT_QUIT) running = 0; // quit game
         }
 
+
+
         CDY_ColorRenderer(simple_window, 0, 0, 0, 255); //BG colour
         CDY_WipeRenderer(simple_window);
+
+        CDY_DrawText(simple_window, fontmain, "Pong Game", gameScreenWidth/2-25, 10, 255, 255, 255);
 
         CDY_ColorRenderer(simple_window, 255, 255, 255, 255); // paddle1 colour
         CDY_DrawEntity(simple_window, paddle1);
@@ -101,11 +107,19 @@ int main(void) {
         {
             ball->posX = paddle1->posX + paddle1->scaleX;
             ballMoveSpeedX *= -1.1;
+            // reflect ball off paddle depending on where it hits paddle
+            float hitPos = (ball->posY + ball->scaleY / 2) - (paddle1->posY + paddle1->scaleY / 2);
+            float normalised = hitPos / (paddle1->scaleY / 2);
+            ballMoveSpeedY = (int)(normalised * 5); // 5 is max bounce speed
         }
         if (CDY_AABBCollide(paddle2, ball))
         {
             ball->posX = paddle2->posX - ball->scaleX;
             ballMoveSpeedX *= -1.1;
+            // reflect ball off paddle depending on where it hits paddle
+            float hitPos = (ball->posY + ball->scaleY / 2) - (paddle1->posY + paddle1->scaleY / 2);
+            float normalised = hitPos / (paddle1->scaleY / 2);
+            ballMoveSpeedY = (int)(normalised * 5); // 5 is max bounce speed
         }
 
         CDY_ArmRenderer(simple_window);
