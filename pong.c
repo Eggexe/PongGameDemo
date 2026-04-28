@@ -6,9 +6,10 @@
 #include "Cloudy/Render/drawing.h"
 #include "Cloudy/Physics/physics.h"
 #include "Cloudy/UI/ui.h"
+#include <SDL2/SDL_ttf.h>
 
-int gameScreenWidth = 640;
-int gameScreenHeight = 480;
+float gameScreenWidth = 640;
+float gameScreenHeight = 480;
 
 int main(void) {
     /* ENGINE INSTANCES */
@@ -19,29 +20,25 @@ int main(void) {
 
     /* USER VARIABLES */
     CDY_Entity *paddle1 = CDY_EntityCreate(entity_manager);
-    paddle1->posX = 50;
-    paddle1->posY = 50;
+    paddle1->posX = gameScreenWidth * 0.08f;
+    paddle1->posY = gameScreenHeight * 0.5f;
     paddle1->scaleX = 25;
     paddle1->scaleY = 100;
 
     CDY_Entity *paddle2 = CDY_EntityCreate(entity_manager);
-    paddle2->posX = 590;
-    paddle2->posY = 330;
+    paddle2->posX = gameScreenWidth * 0.92f - paddle2->scaleX;;
+    paddle2->posY = gameScreenHeight * 0.5;
     paddle2->scaleX = 25;
     paddle2->scaleY = 100;
 
     CDY_Entity *ball = CDY_EntityCreate(entity_manager);
-    ball->posX = 320;
-    ball->posY = 240;
+    ball->posX = gameScreenWidth/2;
+    ball->posY = gameScreenHeight/2;
     ball->scaleX = 15;
     ball->scaleY = 15;
     float ballMoveSpeedX = 2.0f;
     float ballMoveSpeedY = 2.0f;
     int score1 = 0, score2 = 0;
-
-
-
-
 
     CDY_Font *fontmain = CDY_FontLoadDefault(32);
 
@@ -60,8 +57,6 @@ int main(void) {
         while (CDY_PollEvent(&event)) {
                 if (event.type == CDY_EVENT_QUIT) running = 0; // quit game
         }
-
-
 
         CDY_ColorRenderer(simple_window, 0, 0, 0, 255); //BG colour
         CDY_WipeRenderer(simple_window);
@@ -97,6 +92,17 @@ int main(void) {
         if (CDY_IsKeyHeld(input_manager, CDY_KEY_DOWN))
         {
             CDY_TranslateEntity(paddle2, 0, 10);
+        }
+
+        // Prevent paddles from moving OOB
+        if (paddle1->posY < 0) paddle1->posY = 0;
+        if (paddle1->posY + paddle1->scaleY > gameScreenHeight) {
+            paddle1->posY = gameScreenHeight - paddle1->scaleY;
+        }
+
+        if (paddle2->posY < 0) paddle2->posY = 0;
+        if (paddle2->posY + paddle2->scaleY > gameScreenHeight) {
+            paddle2->posY = gameScreenHeight - paddle1->scaleY;
         }
 
         /* Detect if ball misses paddles and then reset ball pos + speed */
@@ -146,7 +152,6 @@ int main(void) {
         }
 
         CDY_ArmRenderer(simple_window);
-
 
         /* GAME LOOP END */
         CDY_FPSEnd(fps);
