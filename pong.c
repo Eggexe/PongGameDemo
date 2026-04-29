@@ -6,8 +6,13 @@
 #include "Cloudy/Render/drawing.h"
 #include "Cloudy/Physics/physics.h"
 #include "Cloudy/UI/ui.h"
-#include <SDL2/SDL_ttf.h>
 
+
+#include <SDL2/SDL_log.h>
+#include <SDL2/SDL_ttf.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 float gameScreenWidth = 640;
 float gameScreenHeight = 480;
 
@@ -19,6 +24,8 @@ int main(void) {
     CDY_FPSManager *fps = CDY_FPSManagerCreate(60);
 
     /* USER VARIABLES */
+    srand(time(NULL));
+
     CDY_Entity *paddle1 = CDY_EntityCreate(entity_manager);
     paddle1->posX = gameScreenWidth * 0.08f;
     paddle1->posY = gameScreenHeight * 0.5f;
@@ -30,14 +37,15 @@ int main(void) {
     paddle2->posY = gameScreenHeight * 0.5;
     paddle2->scaleX = 25;
     paddle2->scaleY = 100;
+    float indirectPosY = paddle2->posY; // read only version of posy
 
     CDY_Entity *ball = CDY_EntityCreate(entity_manager);
     ball->posX = gameScreenWidth/2;
     ball->posY = gameScreenHeight/2;
     ball->scaleX = 15;
     ball->scaleY = 15;
-    float ballMoveSpeedX = 2.0f;
-    float ballMoveSpeedY = 2.0f;
+    float ballMoveSpeedX = 5.0f;
+    float ballMoveSpeedY = 5.0f;
     int score1 = 0, score2 = 0;
 
     CDY_Font *fontmain = CDY_FontLoadDefault(32);
@@ -94,6 +102,16 @@ int main(void) {
             CDY_TranslateEntity(paddle2, 0, 10);
         }
 
+
+        // PADDLE 2 AI CODE1
+        if (ball->posY > paddle2->posY + paddle2->scaleY /3) {
+            CDY_TranslateEntity(paddle2, 0, 10);
+        }
+
+        if (ball->posY < paddle2->posY + paddle2->scaleY /3) {
+            CDY_TranslateEntity(paddle2, 0, -10);
+        }
+
         // Prevent paddles from moving OOB
         if (paddle1->posY < 0) paddle1->posY = 0;
         if (paddle1->posY + paddle1->scaleY > gameScreenHeight) {
@@ -110,15 +128,15 @@ int main(void) {
             score1 += 1;
             ball->posX = 320;
             ball->posY = 240;
-            ballMoveSpeedX = -2;
-            ballMoveSpeedY = 2;
+            ballMoveSpeedX = -5.0f;
+            ballMoveSpeedY = 5.0f;
         }
         if (ball->posX < 0) {
             score2 += 1;
             ball->posX = 320;
             ball->posY = 240;
-            ballMoveSpeedX = 2;
-            ballMoveSpeedY = 2;
+            ballMoveSpeedX = 5.0f;
+            ballMoveSpeedY = 5.0f;
         }
         /* Move the ball in a classic pong fashion */
         // We can multiply the ballMoveSpeedX/Y
@@ -146,9 +164,11 @@ int main(void) {
             ball->posX = paddle2->posX - ball->scaleX;
             ballMoveSpeedX *= -1.1;
             // reflect ball off paddle depending on where it hits paddle
+            int r = rand() % 2;
+            printf("%d\n", r);
             float hitPos = (ball->posY + ball->scaleY / 2) - (paddle2->posY + paddle2->scaleY / 2);
-            float normalised = hitPos / (paddle2->scaleY / 2);
-            ballMoveSpeedY = (int)(normalised * 5); // 5 is max bounce speed
+            float normalised = hitPos / (paddle2->scaleY / 2) + (r+1);
+            ballMoveSpeedY = (int)(normalised * 5); // 5 is max bounce speed*/
         }
 
         CDY_ArmRenderer(simple_window);
