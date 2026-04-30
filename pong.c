@@ -16,7 +16,7 @@
 float gameScreenWidth = 640;
 float gameScreenHeight = 480;
 
-int main(void) {
+int main(int argc, char *argv[]) {
     /* ENGINE INSTANCES */
     CDY_Simple_Window *simple_window = CDY_SimpleWindowCreate("Pong Game Demo", gameScreenWidth, gameScreenHeight);
     CDY_InputManager *input_manager = CDY_InputManagerCreate();
@@ -24,7 +24,17 @@ int main(void) {
     CDY_FPSManager *fps = CDY_FPSManagerCreate(60);
 
     /* USER VARIABLES */
-    srand(time(NULL));
+    srand(time(NULL)); // Random time seed for AI behaviour
+
+    int ai_mode = 0;
+
+    if (argc > 1)
+    {
+        if (argv[1][0] == '-' && argv[1][1] == 'a') ai_mode = 1;
+    }
+    // toggle the use of TIM if a '-a' flag is set
+    // with nothing set, TIM will not activate
+
 
     CDY_Entity *paddle1 = CDY_EntityCreate(entity_manager);
     paddle1->posX = gameScreenWidth * 0.08f;
@@ -92,24 +102,49 @@ int main(void) {
             CDY_TranslateEntity(paddle1, 0, 10);
         }
 
-        if (CDY_IsKeyHeld(input_manager, CDY_KEY_UP))
+        if (ai_mode) // HAS TO BE 1
         {
+            // AI
+            if (ball->posY > paddle2->posY + paddle2->scaleY /3) {
+            CDY_TranslateEntity(paddle2, 0, 8);
+            }
+
+            if (ball->posY < paddle2->posY + paddle2->scaleY /3) {
+            CDY_TranslateEntity(paddle2, 0, -8);
+            }
+
+            if (CDY_AABBCollide(paddle2, ball))
+            {
+            ball->posX = paddle2->posX - ball->scaleX;
+            ballMoveSpeedX *= -1.1;
+            // reflect ball off paddle depending on where it hits paddle
+            int r = rand() % 2;
+            printf("%d\n", r);
+            float hitPos = (ball->posY + ball->scaleY / 2) - (paddle2->posY + paddle2->scaleY / 2);
+            float normalised = hitPos / (paddle2->scaleY / 2) + (r+1);
+            ballMoveSpeedY = (int)(normalised * 5); // 5 is max bounce speed*/
+            }
+        } else {
+
+            if (CDY_IsKeyHeld(input_manager, CDY_KEY_UP))
+            {
             CDY_TranslateEntity(paddle2, 0, -10);
-        }
+            }
 
-        if (CDY_IsKeyHeld(input_manager, CDY_KEY_DOWN))
-        {
+            if (CDY_IsKeyHeld(input_manager, CDY_KEY_DOWN))
+            {
             CDY_TranslateEntity(paddle2, 0, 10);
-        }
+            }
 
-
-        // PADDLE 2 AI CODE1
-        if (ball->posY > paddle2->posY + paddle2->scaleY /3) {
-            CDY_TranslateEntity(paddle2, 0, 10);
-        }
-
-        if (ball->posY < paddle2->posY + paddle2->scaleY /3) {
-            CDY_TranslateEntity(paddle2, 0, -10);
+            if (CDY_AABBCollide(paddle2, ball))
+            {
+            ball->posX = paddle2->posX - ball->scaleX;
+            ballMoveSpeedX *= -1.1;
+            // reflect ball off paddle depending on where it hits paddle
+            float hitPos = (ball->posY + ball->scaleY / 2) - (paddle2->posY + paddle2->scaleY / 2);
+            float normalised = hitPos / (paddle2->scaleY / 2);
+            ballMoveSpeedY = (int)(normalised * 5); // 5 is max bounce speed*/
+            }
         }
 
         // Prevent paddles from moving OOB
