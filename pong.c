@@ -106,11 +106,11 @@ int main(int argc, char *argv[]) {
         {
             // AI
             if (ball->posY > paddle2->posY + paddle2->scaleY /3) {
-            CDY_TranslateEntity(paddle2, 0, 8);
+            CDY_TranslateEntity(paddle2, 0, 6);
             }
 
             if (ball->posY < paddle2->posY + paddle2->scaleY /3) {
-            CDY_TranslateEntity(paddle2, 0, -8);
+            CDY_TranslateEntity(paddle2, 0, -6);
             }
 
             if (CDY_AABBCollide(paddle2, ball))
